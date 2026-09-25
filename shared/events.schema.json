@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ultron.local/events.schema.json",
+  "title": "Ultron WebSocket Envelope",
+  "description": "Single source of truth for every JSON frame on ws://127.0.0.1:8765/ws. id and ts are optional because the frontend's resync frame legitimately omits them; the backend always sets both.",
+  "type": "object",
+  "required": ["v", "type", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "v": { "const": 1 },
+    "id": { "type": "string", "format": "uuid" },
+    "ts": { "type": "integer" },
+    "type": {
+      "enum": [
+        "state",
+        "audio_level",
+        "graph_node",
+        "token",
+        "tool_call",
+        "vram",
+        "model",
+        "error",
+        "transcript",
+        "confirm_request",
+        "screenshot",
+        "snapshot",
+        "pong",
+        "gesture",
+        "user_utterance",
+        "confirm_response",
+        "cancel",
+        "mic",
+        "ping",
+        "resync"
+      ]
+    },
+    "run_id": { "type": "string" },
+    "payload": { "type": "object" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "state" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/StatePayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "audio_level" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/AudioLevelPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "graph_node" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/GraphNodePayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "token" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/TokenPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "tool_call" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ToolCallPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "vram" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/VramPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "model" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ModelPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "error" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ErrorPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "transcript" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/TranscriptPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "confirm_request" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ConfirmRequestPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "screenshot" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ScreenshotPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "snapshot" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/SnapshotPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "pong" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/PongPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "gesture" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/GesturePayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "user_utterance" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/UserUtterancePayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "confirm_response" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ConfirmResponsePayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "cancel" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/CancelPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "mic" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/MicPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "ping" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/PingPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "resync" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ResyncPayload" } } }
+    }
+  ],
+  "$defs": {
+    "StatePayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase"],
+      "properties": {
+        "phase": { "enum": ["idle", "listening", "thinking", "acting", "speaking", "error"] }
+      }
+    },
+    "AudioLevelPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rms"],
+      "properties": {
+        "rms": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "GraphNodePayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "status"],
+      "properties": {
+        "node": { "type": "string" },
+        "status": { "enum": ["active", "done", "failed"] },
+        "ms": { "type": "integer" }
+      }
+    },
+    "TokenPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "role", "done"],
+      "properties": {
+        "text": { "type": "string" },
+        "role": { "const": "assistant" },
+        "done": { "type": "boolean" }
+      }
+    },
+    "ToolCallPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "status"],
+      "properties": {
+        "agent": { "type": "string" },
+        "tool": { "type": "string" },
+        "args_preview": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "VramPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["used_mb", "total_mb", "active_model"],
+      "properties": {
+        "used_mb": { "type": "integer" },
+        "total_mb": { "type": "integer" },
+        "active_model": { "type": ["string", "null"] }
+      }
+    },
+    "ModelPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "model"],
+      "properties": {
+        "phase": { "enum": ["loading", "ready", "unloading", "evicted"] },
+        "model": { "type": "string" }
+      }
+    },
+    "ErrorPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "source", "message"],
+      "properties": {
+        "severity": { "enum": ["info", "warn", "error", "fatal"] },
+        "source": { "type": "string" },
+        "message": { "type": "string" },
+        "traceback": { "type": "string" }
+      }
+    },
+    "TranscriptPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "final"],
+      "properties": {
+        "text": { "type": "string" },
+        "final": { "type": "boolean" }
+      }
+    },
+    "ConfirmRequestPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id", "description", "risk"],
+      "properties": {
+        "action_id": { "type": "string" },
+        "description": { "type": "string" },
+        "risk": { "enum": ["read", "navigate", "write", "send", "destructive"] },
+        "timeout_s": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "ScreenshotPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["png_b64", "caption"],
+      "properties": {
+        "action_id": { "type": "string" },
+        "png_b64": { "type": "string" },
+        "caption": { "type": "string" }
+      }
+    },
+    "SnapshotPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "vram", "active_model"],
+      "properties": {
+        "phase": { "enum": ["idle", "listening", "thinking", "acting", "speaking", "error"] },
+        "active_node": { "type": ["string", "null"] },
+        "messages": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["role", "text"],
+            "properties": {
+              "role": { "type": "string" },
+              "text": { "type": "string" }
+            }
+          }
+        },
+        "vram": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "used_mb": { "type": "integer" },
+            "total_mb": { "type": "integer" }
+          }
+        },
+        "active_model": { "type": ["string", "null"] }
+      }
+    },
+    "PongPayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": []
+    },
+    "GesturePayload": {
+      "x-direction": "server_to_client",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "confirmed"],
+      "properties": {
+        "name": { "enum": ["palm", "pinch", "swipe_left"] },
+        "confirmed": { "type": "boolean" }
+      }
+    },
+    "UserUtterancePayload": {
+      "x-direction": "client_to_server",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "source"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "source": { "enum": ["voice", "text"] }
+      }
+    },
+    "ConfirmResponsePayload": {
+      "x-direction": "client_to_server",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id", "approved"],
+      "properties": {
+        "action_id": { "type": "string" },
+        "approved": { "type": "boolean" }
+      }
+    },
+    "CancelPayload": {
+      "x-direction": "client_to_server",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id"],
+      "properties": {
+        "run_id": { "type": "string" }
+      }
+    },
+    "MicPayload": {
+      "x-direction": "client_to_server",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "PingPayload": {
+      "x-direction": "client_to_server",
+      "type": "object",
+      "additionalProperties": false,
+      "required": []
+    },
+    "ResyncPayload": {
+      "x-direction": "client_to_server",
+      "type": "object",
+      "additionalProperties": false,
+      "required": []
+    }
+  }
+}

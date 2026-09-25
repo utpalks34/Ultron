@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ultron-backend"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic-settings",
+    "httpx",
+    "jsonschema",
+    "asyncpg",
+    "pgvector",
+    "psycopg[binary,pool]",
+    "langgraph",
+    "langgraph-checkpoint-postgres",
+    "langchain-core",
+    "langchain-ollama",
+    "nvidia-ml-py",
+    "rapidfuzz",
+    "mutagen",
+    "psutil",
+    "yt-dlp",
+]
+
+[project.optional-dependencies]
+voice = [
+    "faster-whisper",
+    "sounddevice",
+    "numpy",
+    "piper-tts",
+    "silero-vad",
+    "openwakeword",
+]
+hands = [
+    "playwright",
+    "pyautogui",
+    "pygetwindow",
+]
+vision = [
+    "opencv-python",
+    "mediapipe",
+]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "datamodel-code-generator",
+]
+
+[tool.setuptools]
+packages = []
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

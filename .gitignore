@@ -1,0 +1,14 @@
+models/*
+!models/.gitkeep
+.venv/
+venv/
+.pwprofile/
+node_modules/
+target/
+.env
+__pycache__/
+*.pyc
+dist/
+shared/gen/*
+!shared/gen/.gitkeep
+data/

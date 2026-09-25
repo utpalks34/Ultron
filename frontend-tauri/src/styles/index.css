@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* The accent is the orb's colour for the current phase. App.jsx sets --accent-rgb on :root;
+   registering it lets the browser crossfade between phases instead of snapping. */
+@property --accent-rgb {
+  syntax: "<number>+";
+  inherits: true;
+  initial-value: 30 108 255;
+}
+
+:root {
+  --accent-rgb: 30 108 255;
+  transition: --accent-rgb 450ms ease;
+}
+
+@layer base {
+  html, body, #root { height: 100%; margin: 0; }
+  body {
+    background: #060814;
+    color: #e8ebff;
+    font-family: theme(fontFamily.sans);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-rgb));
+    outline-offset: 2px;
+  }
+  * { scrollbar-width: thin; scrollbar-color: #2a3374 transparent; }
+}
+
+@layer components {
+  /* Three surfaces, on purpose not identical: soft rounded cards on the left, a glassy stage
+     in the centre, dense flat cards for status on the right. */
+  .card-soft {
+    @apply rounded-3xl border border-line/60 backdrop-blur-xl;
+    background: linear-gradient(160deg, rgb(21 27 69 / 0.78), rgb(13 18 48 / 0.72));
+    box-shadow: 0 10px 40px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.04);
+  }
+  .card-stage {
+    @apply rounded-[28px] border border-line/50 bg-panel/55 backdrop-blur-2xl;
+    box-shadow: 0 0 0 1px rgb(var(--accent-rgb) / 0.08), 0 20px 60px rgb(0 0 0 / 0.4);
+  }
+  .card-flat {
+    @apply rounded-xl border border-line/50 bg-panel/80;
+  }
+  .label {
+    @apply text-[13px] font-medium text-muted;
+  }
+  .keycap {
+    @apply rounded-md border border-line/70 bg-ink/60 px-1.5 py-0.5 font-mono text-[11px] text-fg/80;
+  }
+  .accent-wash {
+    background:
+      radial-gradient(55% 42% at 50% 24%, rgb(var(--accent-rgb) / 0.16), transparent 72%),
+      radial-gradient(40% 40% at 8% 100%, rgb(var(--accent-rgb) / 0.06), transparent 70%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { transition: none; }
+}

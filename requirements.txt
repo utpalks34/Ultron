@@ -1,0 +1,74 @@
+# Ultron — backend-ai requirements
+# Python 3.11
+# Install with: pip install -r requirements.txt --break-system-packages
+# (drop --break-system-packages if installing inside a venv)
+
+# ── Web server / orchestration ─────────────────────────────────
+fastapi
+uvicorn[standard]
+websockets
+pydantic
+pydantic-settings
+httpx
+python-dotenv
+jsonschema
+pytest
+
+# ── LangGraph / LangChain ───────────────────────────────────────
+langgraph
+langgraph-checkpoint-postgres
+langchain-core
+langchain-ollama
+
+# ── Database (PostgreSQL + pgvector) ────────────────────────────
+asyncpg
+pgvector
+# sync driver used by scripts/scan_music.py (also pulled in by langgraph-checkpoint-postgres)
+psycopg[binary,pool]
+
+# ── GPU / VRAM telemetry ────────────────────────────────────────
+nvidia-ml-py
+psutil
+
+# ── Speech to text ───────────────────────────────────────────────
+faster-whisper
+sounddevice
+numpy
+# always-on "Hey Jarvis" wake word (sensors/wakeword.py); pretrained models are fetched once
+# with scripts/pull_wakeword_model.py
+openwakeword
+
+# ── Text to speech ───────────────────────────────────────────────
+# If `from piper import PiperVoice` fails, the installed package's API differs from
+# sensors/tts.py and it needs a follow-up fix: report the exact ImportError/AttributeError.
+piper-tts
+
+# ── Vision / gestures ────────────────────────────────────────────
+opencv-python
+mediapipe
+# terminal reading for the dev agent: window capture + OCR (tools/vision.py)
+pillow
+onnxruntime
+rapidocr-onnxruntime
+
+# ── Browser automation ───────────────────────────────────────────
+playwright
+
+# ── Desktop / OS automation (Windows) ────────────────────────────
+pyautogui
+pygetwindow
+pywin32
+
+# ── Local media library ──────────────────────────────────────────
+mutagen
+yt-dlp
+
+# ── Matching / utilities ─────────────────────────────────────────
+rapidfuzz
+
+# ── Post-install steps (not pip-installable) ─────────────────────
+# playwright install chromium
+# ollama pull qwen2.5:1.5b-instruct
+# ollama pull nomic-embed-text
+# ollama pull qwen2.5-coder:3b
+# ollama pull moondream
